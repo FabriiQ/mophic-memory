@@ -20,14 +20,11 @@ import RetrieveSection from '@/components/retrieve-section'
 import { VideoSearchSection } from '@/components/video-search-section'
 import { AnswerSection } from '@/components/answer-section'
 import { workflow } from '@/lib/actions/workflow'
+import { saveMem0Memory } from '@/lib/mem0'
 
 const MAX_MESSAGES = 6
 
-async function submit(
-  formData?: FormData,
-  skip?: boolean,
-  retryMessages?: AIMessage[]
-) {
+async function submit(formData?: FormData, skip?: boolean, retryMessages?: AIMessage[]) {
   'use server'
 
   const aiState = getMutableAIState<typeof AI>()
@@ -36,7 +33,6 @@ async function submit(
   const isCollapsed = createStreamableValue(false)
 
   const aiMessages = [...(retryMessages ?? aiState.get().messages)]
-  // Get the messages from the state, filter out the tool messages
   const messages: CoreMessage[] = aiMessages
     .filter(
       message =>
@@ -50,12 +46,23 @@ async function submit(
       return { role, content } as CoreMessage
     })
 
-  // Limit the number of messages to the maximum
   messages.splice(0, Math.max(messages.length - MAX_MESSAGES, 0))
-  // Get the user input from the form data
-  const userInput = skip
-    ? `{"action": "skip"}`
-    : (formData?.get('input') as string)
+  
+  const userInput = skip ? `{"action": "skip"}` : (formData?.get('input') as string)
+
+  // Save to Mem0 if there's user input
+  if (userInput && !skip) {
+    await saveMem0Memory({
+      infer: true,
+      user_id: aiState.get().userId || 'anonymous',
+      messages: [{
+        role: 'user',
+        content: userInput
+      }],
+      project_name: 'default-project',
+      output_format: 'v1.1'
+    });
+  }
 
   const content = skip
     ? userInput
@@ -110,6 +117,7 @@ export type AIState = {
   messages: AIMessage[]
   chatId: string
   isSharePage?: boolean
+  userId?: string  // Add this line
 }
 
 export type UIState = {

@@ -59,9 +59,6 @@ export async function workflow(
   // Set the collapsed state to true
   isCollapsed.done(true)
 
-  // Remove the spinner
-  uiStream.update(null)
-
   const useOllama = process.env.OLLAMA_MODEL && process.env.OLLAMA_BASE_URL
   // Select the appropriate researcher function based on the environment variables
   const { text, toolResults } = useOllama

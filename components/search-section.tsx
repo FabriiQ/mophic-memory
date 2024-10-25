@@ -34,9 +34,11 @@ export function SearchSection({ result, includeDomains }: SearchSectionProps) {
               />
             </Section>
           )}
+   {/* Remove or comment out this section to hide sources
           <Section title="Sources">
             <SearchResults results={searchResults.results} />
           </Section>
+          */}
         </>
       ) : (
         <DefaultSkeleton />

@@ -1,43 +1,23 @@
-import { notFound, redirect } from 'next/navigation'
 import { Chat } from '@/components/chat'
-import { getChat } from '@/lib/actions/chat'
+import { generateId } from 'ai'
 import { AI } from '@/app/actions'
+import { redirect } from 'next/navigation'
 
 export const maxDuration = 60
 
-export interface SearchPageProps {
-  params: {
-    id: string
-  }
-}
-
-export async function generateMetadata({ params }: SearchPageProps) {
-  const chat = await getChat(params.id, 'anonymous')
-  return {
-    title: chat?.title.toString().slice(0, 50) || 'Search'
-  }
-}
-
-export default async function SearchPage({ params }: SearchPageProps) {
-  const userId = 'anonymous'
-  const chat = await getChat(params.id, userId)
-
-  if (!chat) {
+export default function Page({
+  searchParams
+}: {
+  searchParams: { q: string }
+}) {
+  if (!searchParams.q) {
     redirect('/')
   }
-
-  if (chat?.userId !== userId) {
-    notFound()
-  }
+  const id = generateId()
 
   return (
-    <AI
-      initialAIState={{
-        chatId: chat.id,
-        messages: chat.messages
-      }}
-    >
-      <Chat id={params.id} />
+    <AI initialAIState={{ chatId: id, messages: [] }}>
+      <Chat id={id} query={searchParams.q} />
     </AI>
   )
 }
