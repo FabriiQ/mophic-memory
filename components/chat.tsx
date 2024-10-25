@@ -1,30 +1,64 @@
-'use client'
+import { CoreMessage } from 'ai';
+import { memoryManager } from '@/lib/agents/memory-manager';
 
-import { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
-import { ChatPanel } from './chat-panel'
-import { ChatMessages } from './chat-messages'
-import { useUIState } from 'ai/rsc'
+export async function memoryManager(messages: CoreMessage[], userId?: string, agentId?: string) {
+  const apiKey = process.env.MEM0_API_KEY;
+  
+  async function addMemory(content: string) {
+    const memory: Mem0Payload = {
+      infer: true,
+      user_id: userId || '',
+      messages: [{
+        role: 'user',
+        content: content
+      }],
+      project_name: 'morphic',
+      output_format: 'v1.1'
+    };
 
-type ChatProps = {
-  id?: string
-  query?: string
+    await fetch('/api/add', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(memory)
+    });
+  }
+
+  async function searchMemories(query: string) {
+    const searchBody = {
+      query,
+      user_id: userId,
+      agent_id: agentId,
+      project_name: 'morphic'
+    };
+
+    const response = await fetch('/api/search', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(searchBody)
+    });
+
+    return response.json();
+  }
+
+  return {
+    addMemory,
+    searchMemories
+  };
 }
 
-export function Chat({ id, query }: ChatProps) {
-  const path = usePathname()
-  const [messages] = useUIState()
-
-  useEffect(() => {
-    if (!path.includes('search') && messages.length === 1) {
-      window.history.replaceState({}, '', `/search/${id}`)
-    }
-  }, [id, path, messages, query])
-
-  return (
-    <div className="px-8 sm:px-12 pt-12 md:pt-14 pb-14 md:pb-24 max-w-3xl mx-auto flex flex-col space-y-3 md:space-y-4">
-      <ChatMessages messages={messages} />
-      <ChatPanel messages={messages} query={query} />
-    </div>
-  )
+interface Mem0Payload {
+  infer: boolean;
+  user_id: string;
+  messages: Array<{
+    role: string;
+    content: string;
+  }>;
+  project_name: string;
+  output_format: string;
 }

@@ -1,16 +1,15 @@
 interface Mem0Payload {
-    infer: boolean;
-    user_id: string;
     messages: Array<{
       role: string;
       content: string;
     }>;
-    project_name: string;
+    user_id?: string;
+    agent_id?: string;
     output_format: string;
   }
   
   export async function saveMem0Memory(payload: Mem0Payload) {
-    const response = await fetch('https://api.mem0.ai/v1/memories', {
+    const response = await fetch('/api/add', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.MEM0_API_KEY}`,
@@ -18,6 +17,5 @@ interface Mem0Payload {
       },
       body: JSON.stringify(payload)
     });
-    
     return response.json();
   }
