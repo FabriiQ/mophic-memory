@@ -1,7 +1,7 @@
 import { CoreMessage } from 'ai';
-import { memoryManager } from '@/lib/agents/memory-manager';
+import { memoryManager as importedMemoryManager } from '@/lib/agents/memory-manager';
 
-export async function memoryManager(messages: CoreMessage[], userId?: string, agentId?: string) {
+export async function localMemoryManager(messages: CoreMessage[], userId?: string, agentId?: string) {
   const apiKey = process.env.MEM0_API_KEY;
   
   async function addMemory(content: string) {

@@ -2,11 +2,8 @@ import { CoreMessage } from 'ai';
 
 export const createMemoryManager = async (messages: CoreMessage[], userId?: string, agentId?: string) => {
   const apiKey = process.env.MEM0_API_KEY;
-// Rename the function to createMemoryManager
-export async function createMemoryManager(messages: CoreMessage[], userId?: string, agentId?: string) {
-  const apiKey = process.env.MEM0_API_KEY;
   
-  async function addMemory(content: string) {
+  const addMemory = async (content: string) => {
     const memory = {
       content,
       user_id: userId,
@@ -21,9 +18,9 @@ export async function createMemoryManager(messages: CoreMessage[], userId?: stri
       },
       body: JSON.stringify(memory)
     });
-  }
+  };
 
-  async function searchMemories(query: string) {
+  const searchMemories = async (query: string) => {
     const searchBody = {
       query,
       user_id: userId,
@@ -40,10 +37,10 @@ export async function createMemoryManager(messages: CoreMessage[], userId?: stri
     });
 
     return response.json();
-  }
+  };
 
   return {
     addMemory,
     searchMemories
   };
-}
+};

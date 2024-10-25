@@ -1,5 +1,5 @@
 {
-  "name": "morphic",
+  "name": "Companio",
   "version": "0.1.0",
   "private": true,
   "license": "Apache-2.0",
@@ -41,7 +41,6 @@
     "next-themes": "^0.3.0",
     "node-html-parser": "^6.1.13",
     "ollama-ai-provider": "^0.15.1",
-    "posthog-node": "^4.2.1",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
     "react-markdown": "^8.0.7",
